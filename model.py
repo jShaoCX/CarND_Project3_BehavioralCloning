@@ -5,6 +5,7 @@ import cv2
 import csv
 import random
 from sklearn.utils import shuffle
+import matplotlib.pyplot as plt
 
 ave_bright = 128 #128
 std_bright = 32 #should be around 10
@@ -37,7 +38,7 @@ def data_aug(X_orig,y_orig):
         M = np.float32([[1,0,shiftX],[0,1,0]])
         newImg = np.array(cv2.warpAffine(aug_bright_im, M,(320,160)))
         aug_X=newImg
-        newSteer = -0.01*shiftX + currentSteer
+        newSteer = -0.0036*shiftX + currentSteer
         aug_y=newSteer
     return aug_X, aug_y
 
@@ -73,25 +74,64 @@ X_valid = np.array(valid_images)
 y_valid = np.array(valid_measurements)
 
 '''
+all_images = []
+all_measurements = []
+for i in range(0,len(lines)):
+    path = './data/' + lines[i][0] #center image
+    measurement = float(lines[i][3])
+    imageBGR = cv2.imread(path)
+    image = cv2.cvtColor(imageBGR, cv2.COLOR_BGR2YUV)
+    all_images.append(image)
+    all_measurements.append(measurement)
+X_train = np.array(all_images)
+y_train = np.array(all_measurements)
+'''
+
+
 #getting a sense of how unbalanced the data is
 
 from collections import Counter
+
+my_data = []
 
 myCounter = Counter()
 for i in range(0,len(lines)):
     path = './data/' + lines[i][0] #center image
     measurement = float(lines[i][3])
     if measurement == 0:
-        if i%2==0 or i%3 == 0 or i%5 == 0 or i%7 == 0 or i%11==0:
+        if i%2==0 or i%3 == 0 or i%5 == 0 or i%7 == 0:
             pass
         else:
             myCounter[measurement] += 1
+            my_data.append(measurement)
     else:
         myCounter[measurement] += 1
         myCounter[-measurement] += 1
+        my_data.append(measurement)
+        my_data.append(-measurement)
 
-#print(myCounter.most_common()[:30])
-'''
+print(myCounter.most_common()[:30])
+
+print(len(my_data))
+
+from matplotlib.pyplot import savefig
+
+labels =  [entry[0] for entry in myCounter.most_common()]
+frequencies = [entry[1] for entry in myCounter.most_common()]
+
+mpl_fig = plt.figure()
+ax = mpl_fig.add_subplot(111)
+
+y = frequencies
+N = len(y)
+x = labels
+width = 0.01
+plt.bar(x, y, width, color="blue")
+ax.set_title('Testing Data Distribution')
+ax.set_ylabel('Frequency')
+ax.set_xlabel('Steering Angle')
+fig = plt.gcf()
+savefig('training_data_graph.png')
 
 def myGenerator(my_lines, batch_size):
     while True:
@@ -134,9 +174,10 @@ def myGenerator(my_lines, batch_size):
 #print(np.mean(X_valid[:,:,:,1])) #128
 #print(np.std(X_valid[:,:,:,1])) #10
 
-
+''''
 from keras.models import Sequential
 from keras.layers import Flatten, Convolution2D, MaxPooling2D, Dense, Lambda, Cropping2D, Activation, Dropout, AveragePooling2D
+import matplotlib.pyplot as plt
 
 model = Sequential()
 model.add(Cropping2D(cropping=((60,20),(0,0)), input_shape=(160,320,3)))
@@ -153,7 +194,7 @@ model.add(Convolution2D(64, 3, 3, border_mode="same", activation="relu"))
 model.add(Flatten())
 model.add(Dense(100))
 model.add(Activation('relu'))
-model.add(Dropout(0.4))
+#model.add(Dropout(0.4))
 model.add(Dense(50))
 model.add(Activation('relu'))
 model.add(Dense(10))
@@ -161,6 +202,17 @@ model.add(Activation('relu'))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-#model.fit(X_all, y_all, validation_split=0.2,shuffle=True, epochs=3)
-model.fit_generator(myGenerator(lines_train, 64),samples_per_epoch=115, epochs=4, validation_data=(X_valid,y_valid))
+#history_object = model.fit(X_train, y_train, validation_split=0.2,shuffle=True, epochs=5)
+history_object = model.fit_generator(myGenerator(lines_train, 64),samples_per_epoch=115, epochs=6, validation_data=(X_valid,y_valid), verbose=1)
 model.save('model.h5')
+
+print(history_object.history.keys())
+
+plt.plot(history_object.history['loss'])
+plt.plot(history_object.history['val_loss'])
+plt.title('model mse')
+plt.ylabel('mse')
+plt.xlabel('epoch')
+plt.legend(['training', 'validation'], loc='upper right')
+plt.show()
+'''
