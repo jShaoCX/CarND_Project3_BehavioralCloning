@@ -22,7 +22,7 @@ The goals / steps of this project are the following:
 [image2]: ./final_images/ModifiedNvidiaModel.png "modified nvidia model"
 [image3]: ./final_images/start_steer_to_lane_line.jpg "steer to line 1"
 [image4]: ./final_images/close_to_lane_line.jpg "steer to line 2"
-[image5]: ./final_images/recover_from_lane_line.jpg "steer to line 3"
+[image5]: ./final_images/recover_lane_line.jpg "steer to line 3"
 [image6]: ./final_images/steer_straight.jpg "steer straight"
 
 [image7]: ./final_images/original_image.png "non flipped image"
