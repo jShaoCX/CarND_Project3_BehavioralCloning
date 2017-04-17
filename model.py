@@ -5,10 +5,14 @@ import cv2
 import csv
 import random
 from sklearn.utils import shuffle
+from keras.models import Sequential
+from keras.layers import Flatten, Convolution2D, MaxPooling2D, Dense, Lambda, Cropping2D, Activation, Dropout, AveragePooling2D
 import matplotlib.pyplot as plt
+from collections import Counter
 
-ave_bright = 128 #128
-std_bright = 32 #should be around 10
+
+#ave_bright = 128 #128
+#std_bright = 32 #should be around 10
 
 def data_aug(X_orig,y_orig):
     currentIm = X_orig
@@ -89,9 +93,6 @@ y_train = np.array(all_measurements)
 
 
 #getting a sense of how unbalanced the data is
-
-from collections import Counter
-
 my_data = []
 
 myCounter = Counter()
@@ -174,11 +175,6 @@ def myGenerator(my_lines, batch_size):
 #print(np.mean(X_valid[:,:,:,1])) #128
 #print(np.std(X_valid[:,:,:,1])) #10
 
-''''
-from keras.models import Sequential
-from keras.layers import Flatten, Convolution2D, MaxPooling2D, Dense, Lambda, Cropping2D, Activation, Dropout, AveragePooling2D
-import matplotlib.pyplot as plt
-
 model = Sequential()
 model.add(Cropping2D(cropping=((60,20),(0,0)), input_shape=(160,320,3)))
 model.add(AveragePooling2D())
@@ -203,7 +199,7 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 #history_object = model.fit(X_train, y_train, validation_split=0.2,shuffle=True, epochs=5)
-history_object = model.fit_generator(myGenerator(lines_train, 64),samples_per_epoch=115, epochs=6, validation_data=(X_valid,y_valid), verbose=1)
+history_object = model.fit_generator(myGenerator(lines_train, 64),samples_per_epoch=150, epochs=6, validation_data=(X_valid,y_valid), verbose=1)
 model.save('model.h5')
 
 print(history_object.history.keys())
@@ -215,4 +211,3 @@ plt.ylabel('mse')
 plt.xlabel('epoch')
 plt.legend(['training', 'validation'], loc='upper right')
 plt.show()
-'''

@@ -59,23 +59,23 @@ python drive.py model.h5
 
 ####3. Submission code is usable and readable
 
-The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. Line 20 of the model.py file is the data augmentation function used by the generator. Lines 47 to 73 contain the code to split the original data into training and validation. Line 76 was used to experiment with the model before using a data generator. Lines 90 to 107 was code to determine the distribution of the data and how to make the data less unbalanced. Line 96 is the generator that uses the data augmentation function and attempts to balance the data at the same time. Finally, lines 156 to 176 is the actual model. 
+The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. Line 17 of the model.py file is the data augmentation function used by the generator. Lines 53 to 78 contain the code to split the original data into training and validation. Line 80 was used to experiment with the model before using a data generator. Lines 90 to 107 was code to determine the distribution of the data and how to make the data less unbalanced. Line 137 is the generator that uses the data augmentation function and attempts to balance the data at the same time. Finally, lines 178 to 198 is the actual model. 
 
 ###Model Architecture and Training Strategy
 
 ####1. An appropriate model architecture has been employed
 
-I followed the nvidia self driving car model explained in the lesson videos with only small modifications (model.py lines 156-176). The model first does some preprocessing by cropping out 60 pixels from the top and 20 pixels from the bottom of the image. Then, I use an average pooling layer to downsample the image followed by the lambda layer to normalize the image before sending in into a convolutional layer. The model contains filters of 5x5 and 3x3 and depts varying from 24 to 64. The model uses ReLU layers to introduce nonlinearity as seen in all the convolutional layers' activation functions and following all of the fully connected layers later in the network. 
+I followed the nvidia self driving car model explained in the lesson videos with only small modifications (model.py lines 178-198). The model first does some preprocessing by cropping out 60 pixels from the top and 20 pixels from the bottom of the image. Then, I use an average pooling layer to downsample the image followed by the lambda layer to normalize the image before sending in into a convolutional layer. The model contains filters of 5x5 and 3x3 and depts varying from 24 to 64. The model uses ReLU layers to introduce nonlinearity as seen in all the convolutional layers' activation functions and following all of the fully connected layers later in the network. 
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains one dropout layer to reduce overfitting (model.py line 171). I did not add more because I assumed that the amount of data augmentation being used would allow for the model to not encounter many occurances of the exact same image and hence overfit to that particular image. 
+The model contained one dropout layer to reduce overfitting (model.py line 193) but I removed it after starting data augmentation. The training loss did not converge with the validation loss with dropout and within a reasonable number of epochs. I assumed that the amount of data augmentation being used would allow for the model to not encounter many occurances of the exact same image and hence overfit to that particular image. 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting. Line 55 shows the split between data and line 165 shoes the fit_generator function using the separate validation data to determine a validation loss. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting. Line 60 shows the split between data and line 202 shoes the fit_generator function using the separate validation data to determine a validation loss. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 180).
+The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 200).
 
 ####4. Appropriate training data
 
@@ -100,7 +100,7 @@ Note that the validation loss is still below the training loss the entire time. 
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 156-176) consisted of a cropping layer that removed the top 60 and bottom 20 rows of pixels. The average pooling layer downsamples the image and the lambda layer normalizes the image to values between -1 and 1. The rest of the model closely follows the nvidia model. The first convolution layer is a 5x5x24 with same padding and a ReLU activation followed by a max pooling. The second convolution layer is a 5x5x36 with same padding and a ReLU activation followed by max pooling. The third convolution is a 5x5x48 with same padding and a ReLU activation followed by max pooling. The next two convolution layers are 3x3x64 with same padding and ReLU activation but no max pooling afterwards. The model then goes on to flatten the data and go through a 100 node fully connected layer with ReLU activation, a 50 node fully connected layer with ReLU activation and a 10 node layer with ReLU activation. The final node outputs a regression so there is no nonlinear activation.
+The final model architecture (model.py lines 178-198) consisted of a cropping layer that removed the top 60 and bottom 20 rows of pixels. The average pooling layer downsamples the image and the lambda layer normalizes the image to values between -1 and 1. The rest of the model closely follows the nvidia model. The first convolution layer is a 5x5x24 with same padding and a ReLU activation followed by a max pooling. The second convolution layer is a 5x5x36 with same padding and a ReLU activation followed by max pooling. The third convolution is a 5x5x48 with same padding and a ReLU activation followed by max pooling. The next two convolution layers are 3x3x64 with same padding and ReLU activation but no max pooling afterwards. The model then goes on to flatten the data and go through a 100 node fully connected layer with ReLU activation, a 50 node fully connected layer with ReLU activation and a 10 node layer with ReLU activation. The final node outputs a regression so there is no nonlinear activation.
 
 The performance of the final model architecture, data augmentation generator implementation, split and preprocessing of data can be seen in the video labeled run1.
 
@@ -129,7 +129,7 @@ After the collection process, I had 9214 data points and with flipping all non-z
 
 ![raw data distribution][image13]
 
-I used a counter (model.py line 92) to find how many 0 steering angle data points there were. There were 4770 of the 0 steering angle images. I integrated a skip block for 0 steering angle data points using modulus on the index of the data point and decreased the number of 0 steering angle data points to 1114 and reducing the total data points to 10002. 
+I used a counter (model.py line 92) to find how many 0 steering angle data points there were. There were 4770 of the 0 steering angle images. I integrated a skip block for 0 steering angle data points using modulo operation on the index of the data point (model.py line 147) and decreased the number of 0 steering angle data points to 1114 and reducing the total data points to 10002. 
 
 ![data distribution][image10]
 
