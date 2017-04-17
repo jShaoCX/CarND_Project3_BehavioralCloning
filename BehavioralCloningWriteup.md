@@ -30,8 +30,9 @@ The goals / steps of this project are the following:
 
 [image9]: ./final_images/calculation_scratch.jpg "calculation image"
 [image10]: ./final_images/training_data_graph.png "data distribution"
+[image11]: ./final_images/MeasurementImage.jpg "measurement image"
 
-[image11]: ./final_images/na.png "model visualization"
+[image12]: ./final_images/na.png "model visualization"
 
 
 ## Rubric Points
@@ -128,8 +129,9 @@ After the collection process, I had 9214 data points and with flipping all non-z
 
 I shuffled the list of strings for the data points from the csv file before splitting them into a validation and train set. The validation set was 20% of the total set of 9214, which resulted in 1841 validation points. The numbers for the 0 steering angle data points and the distribution of the validation set varies because of the shuffle the flipping of the images and filtering out of 0 steering angle images. But that did not have an adverse affect on the training. 
 
-The augmentation of each data point was limited to flattening out of the brightness, rotation, and shift. I figured flattening out the brightness by setting all of the first channel of every image to 128 (the average brightness of the training set) would allow the model to ignore shadows in the road. Rotation may not be necessary but I added small rotations (-6 to 6 degrees) to vary the types of augmentation available. On a flat road, it doesn't make sense but I felt that it would be relevant to the mountain track because there are points where the road tilts going downhill and uphill. The shift was calculated using the image below and some assumptions I made about the road width:
+The augmentation of each data point was limited to flattening out of the brightness, rotation, and shift. I figured flattening out the brightness by setting all of the first channel of every image to 128 (the average brightness of the training set) would allow the model to ignore shadows in the road. Rotation may not be necessary but I added small rotations (-6 to 6 degrees) to vary the types of augmentation available. On a flat road, it doesn't make sense but I felt that it would be relevant to the mountain track because there are points where the road tilts going downhill and uphill. The shift was calculated using the image below and some assumptions I made about the road width. The calculations are included in the second image:
 
+![measurement][image11]
 ![calculation][image9]
 
 After some basic runs of 3 epochs to see if the loss was decreasing, I found that the ideal number of epochs was 5-6 as evidenced by the train and validation loss graphs produced in the previous sections. At around 5-6 epochs, the validation and training losses converged, the training loss stopped decreasing as well by then. I used an adam optimizer so that manually training the learning rate wasn't necessary.
