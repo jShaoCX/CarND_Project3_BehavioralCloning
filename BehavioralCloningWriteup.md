@@ -20,18 +20,18 @@ The goals / steps of this project are the following:
 
 [image1]: ./final_images/RawNvidiaModel.png "raw nvidia model"
 [image2]: ./final_images/ModifiedNvidiaModel.png "modified nvidia model"
-[image3]: ./final_images/start_steer_to_lane_line.png "steer to line 1"
-[image4]: ./final_images/close_to_lane_line.png "steer to line 2"
-[image5]: ./final_images/recover_from_lane_line.png "steer to line 3"
-[image6]: ./final_images/steer_straight.png "steer straight"
+[image3]: ./final_images/start_steer_to_lane_line.jpg "steer to line 1"
+[image4]: ./final_images/close_to_lane_line.jpg "steer to line 2"
+[image5]: ./final_images/recover_from_lane_line.jpg "steer to line 3"
+[image6]: ./final_images/steer_straight.jpg "steer straight"
 
 [image7]: ./final_images/original_image.png "non flipped image"
 [image8]: ./final_images/flipped_image.png "flipped image"
 
-[image9]: ./final_images/calculation_scratch.png "calculation image"
+[image9]: ./final_images/calculation_scratch.jpg "calculation image"
 [image10]: ./final_images/training_data_graph.png "data distribution"
 
-[image11]: ./final_images/training_data_graph.png "model visualization"
+[image11]: ./final_images/na.png "model visualization"
 
 
 ## Rubric Points
