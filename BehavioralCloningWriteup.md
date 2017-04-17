@@ -18,13 +18,21 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+[image1]: ./final_images/RawNvidiaModel.png "raw nvidia model"
+[image2]: ./final_images/ModifiedNvidiaModel.png "modified nvidia model"
+[image3]: ./final_images/start_steer_to_lane_line.png "steer to line 1"
+[image4]: ./final_images/close_to_lane_line.png "steer to line 2"
+[image5]: ./final_images/recover_from_lane_line.png "steer to line 3"
+[image6]: ./final_images/steer_straight.png "steer straight"
+
+[image7]: ./final_images/original_image.png "non flipped image"
+[image8]: ./final_images/flipped_image.png "flipped image"
+
+[image9]: ./final_images/calculation_scratch.png "calculation image"
+[image10]: ./final_images/training_data_graph.png "data distribution"
+
+[image11]: ./final_images/training_data_graph.png "model visualization"
+
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -76,36 +84,34 @@ I used the training data provided by the project and it seemed to be enough to c
 
 From the progression in the lesson videos (from single layer convolution, to LeNet, to the nvidia architecture), it seems that the larger the network, the better and smoother the performance. I split my image and steering angle data into training and validation sets to check the initial performance of the plain nvidia model with only the preprocessing that was shown in the lesson. The resulting loss graph is show below:
 
-RAW NVIDIA MODEL LOSS GRAPH
+![Raw Nvidia Model][image1]
 
 Though the performance on the dirt track of the original nvidia model was quite good, it did not perform very well at all on the mountain track. This indicates that it overfit to the dirt track's 8000+ data points. The graph shows that the validation loss was actually lower than the training loss and by the 5th epoch, the training loss and the validation loss converge. This seems to indicate no overfitting to the data because by the 5th epoch, the training loss had flattened out. However, it could still mean that the model is fitting the training data ideally and the training data does not represent enough driving scenarios. The low validation loss could be due to the fact that the validation set has a set of images that closely represent the training set (since most of the original data set looks very similar). 
 
 In order to improve performance on the challenge and training times, I added a downsampling layer where I used average pooling after the cropping layer. My assumption is that the features of interest like the lane lines would not be obscured by one layer of downsampling but any noise within the road like small bits of shadow or the texture of the road would be smoothed out. It also decreased the training time by ~75% and the loss graph is shown below. At this point I removed the drop out layer because I assumed that the data augmentation generator would provide diverse enough data to prevent overfitting:
 
-MODIFIED NVIDIA MODEL LOSS GRAPH
+![Modified Nvidia Model][image2]
 
 Note that the validation loss is still below the training loss the entire time. This could be explained by the fact that a generator was used on the training set. Most of the samples that go through the generator were augmented images so it is unlikely that given the epoch range of 4 to 6 that the model could overfit this dynamic training set. More details on the data augmentation generator can be found in section 3 following this section. This version of the nvidia model performed just as well on the training track (dirt track) and was able to get through at least a quarter of the challenge track.
 
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 156-176) consisted of a cropping layer that removed the top 60 and bottom 20 rows of pixels. The average pooling layer downsamples the image and the lambda layer normalizes the image to values between -1 and 1. The rest of the model closely follows the nvidia model. The first convolution layer is a 5x5x24 with same padding and a ReLU activation followed by a max pooling. The second convolution layer is a 5x5x36 with same padding and a ReLU activation followed by max pooling. The third convolution is a 5x5x48 with same padding and a ReLU activation followed by max pooling. The next two convolution layers are 3x3x64 with same padding and ReLU activation but no max pooling afterwards. The model then goes on to flatten the data and go through a 100 node fully connected layer with ReLU activation, a 50 node fully connected layer with ReLU activation and a 10 node layer with ReLU activation. The final node outputs a regression so there is no nonlinear activation:  
+The final model architecture (model.py lines 156-176) consisted of a cropping layer that removed the top 60 and bottom 20 rows of pixels. The average pooling layer downsamples the image and the lambda layer normalizes the image to values between -1 and 1. The rest of the model closely follows the nvidia model. The first convolution layer is a 5x5x24 with same padding and a ReLU activation followed by a max pooling. The second convolution layer is a 5x5x36 with same padding and a ReLU activation followed by max pooling. The third convolution is a 5x5x48 with same padding and a ReLU activation followed by max pooling. The next two convolution layers are 3x3x64 with same padding and ReLU activation but no max pooling afterwards. The model then goes on to flatten the data and go through a 100 node fully connected layer with ReLU activation, a 50 node fully connected layer with ReLU activation and a 10 node layer with ReLU activation. The final node outputs a regression so there is no nonlinear activation.
 
-VISUALIZE ARCHITECTURE
-
-![alt text][image1]
+The performance of the final model architecture, data augmentation generator implementation, split and preprocessing of data can be seen in the video labeled run1.
 
 ####3. Creation of the Training Set & Training Process
 
 I used the original data provided for the project and found that to be enough. Any new data I tried to append did not improve the performance of the training track (the model performs very well without any additional data). Furthermore, the trials that I added made the driving jitter possibly due to the way I drove manually with the keyboard. The pre-collected data seemed to exhibit very smooth behavior on some of the straight sections:
 
-![alt text][image2]
+![straight][image6]
 
-There are various sections where the training data purposely steers into the lane lines and recovers. Furthermore, the sharp turns section after the bridge is where a portion of the data collection started. I assume this was to gather more data on turning instead of gathering more 0 degree steering angle data which is plentiful. 
+There are various sections where the training data purposely steers into the lane lines and recovers. Furthermore, the sharp turns section after the bridge is where a portion of the data collection started. I assume this was to gather more data on turning instead of gathering more 0 degree steering angle data which is plentiful. The steering an recovery can be seen in the following series of images:
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+![steer to lane 1][image3]
+![steer to lane 2][image4]
+![steer to lane 3][image5]
 
 I did not end up using the left and right camera because I did not have enough time to determine the correction factor and also extra lines would have had to been added to the data augmentation generator. I believe that the shift augmentation applied to the images (along with the steering correction) would create enough data such that using other cameras was not necessary. It also bloated the amount of images I needed to store and transfer between hard drives but given more time it would be interesting to explore the other cameras as well. 
 
@@ -113,17 +119,17 @@ I also added about half the track of images from the second track (the mountain 
 
 I followed the instructions to decrease the preference for a left turn in the dirt track and flipped all non-zero steering angle images and added that to the data set on the fly:
 
-![alt text][image6]
-![alt text][image7]
+![original][image7]
+![flipped][image8]
 
 After the collection process, I had 9214 data points and with flipping all non-zero steering angle images and appending that to the data set, the total points increased to 13658. Unforunately, most of them were 0 steering angle data. I used a counter (model.py line 92) to find how many 0 steering angle data points there were. There were 4770 of the 0 steering angle images. I integrated a skip block for 0 steering angle data points using modulus on the index of the data point and decreased the number of 0 steering angle data points to 1114 and reducing the total data points to 10002. 
 
-HISTOGRAM OF DATA DISTRIBUTION
+![data distribution][image10]
 
 I shuffled the list of strings for the data points from the csv file before splitting them into a validation and train set. The validation set was 20% of the total set of 9214, which resulted in 1841 validation points. The numbers for the 0 steering angle data points and the distribution of the validation set varies because of the shuffle the flipping of the images and filtering out of 0 steering angle images. But that did not have an adverse affect on the training. 
 
 The augmentation of each data point was limited to flattening out of the brightness, rotation, and shift. I figured flattening out the brightness by setting all of the first channel of every image to 128 (the average brightness of the training set) would allow the model to ignore shadows in the road. Rotation may not be necessary but I added small rotations (-6 to 6 degrees) to vary the types of augmentation available. On a flat road, it doesn't make sense but I felt that it would be relevant to the mountain track because there are points where the road tilts going downhill and uphill. The shift was calculated using the image below and some assumptions I made about the road width:
 
-IMAGE OF CALCULATIONS
+![calculation][image9]
 
 After some basic runs of 3 epochs to see if the loss was decreasing, I found that the ideal number of epochs was 5-6 as evidenced by the train and validation loss graphs produced in the previous sections. At around 5-6 epochs, the validation and training losses converged, the training loss stopped decreasing as well by then. I used an adam optimizer so that manually training the learning rate wasn't necessary.
