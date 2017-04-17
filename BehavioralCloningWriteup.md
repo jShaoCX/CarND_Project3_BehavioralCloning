@@ -34,6 +34,8 @@ The goals / steps of this project are the following:
 
 [image12]: ./final_images/na.png "model visualization"
 
+[image13]: ./final_images/raw_training_data_graph.png "raw data distribution"
+
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -123,7 +125,11 @@ I followed the instructions to decrease the preference for a left turn in the di
 ![original][image7]
 ![flipped][image8]
 
-After the collection process, I had 9214 data points and with flipping all non-zero steering angle images and appending that to the data set, the total points increased to 13658. Unforunately, most of them were 0 steering angle data. I used a counter (model.py line 92) to find how many 0 steering angle data points there were. There were 4770 of the 0 steering angle images. I integrated a skip block for 0 steering angle data points using modulus on the index of the data point and decreased the number of 0 steering angle data points to 1114 and reducing the total data points to 10002. 
+After the collection process, I had 9214 data points and with flipping all non-zero steering angle images and appending that to the data set, the total points increased to 13658. Unforunately, most of them were 0 steering angle data:
+
+![raw data distribution][image13]
+
+I used a counter (model.py line 92) to find how many 0 steering angle data points there were. There were 4770 of the 0 steering angle images. I integrated a skip block for 0 steering angle data points using modulus on the index of the data point and decreased the number of 0 steering angle data points to 1114 and reducing the total data points to 10002. 
 
 ![data distribution][image10]
 
